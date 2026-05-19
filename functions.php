@@ -58,7 +58,7 @@ function request(string $method, string $uri, $upload_resource = null, ?array $a
     curl_close($curl);
 
     
-    $headers = new HeaderStruct(explode("\r\n", substr($raw_response, 0, $info['header_size'])));
+    $headers = new Headers(explode("\r\n", substr($raw_response, 0, $info['header_size'])));
     $response_body = substr($raw_response, $info['header_size']);
     
     if (isset($headers['status']) === false) {
