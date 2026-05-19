@@ -11,20 +11,30 @@ function request(string $method, string $uri, $upload_resource = null, ?array $a
     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
     
     if (isset($authorization)) {
-        $sender_key = Key::fromHex($authorization['key'] ?? 'a71a415936f2dd70b777e5204c57e0df9a6dffef91b3c78c1aa24e54772e33c3');
-        unset($authorization['key']);
-        $sender_pubkey = $authorization['pubkey'] ?? $sender_key(Key::public());
-        unset($authorization['pubkey']);
-        
-        $tags = [];
-        if (isset($authorization['expiration']) === false) {
-            $tags[] = ["expiration", time() + 3600];
+        switch ($authorization[0]) {
+            case 'nostr':
+                $details = $authorization[1];
+                
+                $sender_key = Key::fromHex($details['key'] ?? 'a71a415936f2dd70b777e5204c57e0df9a6dffef91b3c78c1aa24e54772e33c3');
+                unset($details['key']);
+                $sender_pubkey = $details['pubkey'] ?? $sender_key(Key::public());
+                unset($details['pubkey']);
+
+                $tags = [];
+                if (isset($details['expiration']) === false) {
+                    $tags[] = ["expiration", time() + 3600];
+                }
+                foreach ($details as $tag => $value) {
+                    $tags[] = [$tag, $value];
+                }
+
+                $headers[] = 'Authorization: ' . Headers::authorization($sender_key, $method, $uri, $tags);
+                break;
+            case 'user':
+                curl_setopt($curl, CURLOPT_USERNAME, $authorization[1]);
+                curl_setopt($curl, CURLOPT_USERPWD, $authorization[2]);
+                break;
         }
-        foreach ($authorization as $tag => $value) {
-            $tags[] = [$tag, $value];
-        }
-        
-        $headers[] = 'Authorization: ' . Headers::authorization($sender_key, $method, $uri, $tags);
     }
     
     switch ($method) {
