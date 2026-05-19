@@ -4,7 +4,7 @@ namespace nostriphant\HTTP;
 
 use nostriphant\NIP01\Key;
 
-function request(string $method, string $uri, $upload_resource = null, ?array $authorization = null, ?array $headers = []) : array {
+function request(string $method, string $uri, $upload_resource = null, ?array $authorization = null, ?array $headers = []) : ServerResponse {
     $curl = curl_init($uri);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_HEADER, true);
@@ -75,5 +75,5 @@ function request(string $method, string $uri, $upload_resource = null, ?array $a
         throw new \Exception(var_export($raw_response, true));
     }
     
-    return [$headers['protocol'], $headers['status'], $headers, $response_body];
+    return new ServerResponse($headers['protocol'], $headers['status'], $headers, $response_body);
 }
