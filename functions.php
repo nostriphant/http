@@ -31,8 +31,7 @@ function request(string $method, string $uri, $upload_resource = null, ?array $a
                 $headers[] = 'Authorization: ' . Headers::authorization($sender_key, $method, $uri, $tags);
                 break;
             case 'user':
-                curl_setopt($curl, CURLOPT_USERNAME, $authorization[1]);
-                curl_setopt($curl, CURLOPT_USERPWD, $authorization[2]);
+                $headers[] = 'Authorization: Basic '. base64_encode($authorization[1] . ":" . $authorization[2]);
                 break;
         }
     }
@@ -42,6 +41,7 @@ function request(string $method, string $uri, $upload_resource = null, ?array $a
             curl_setopt($curl, CURLOPT_NOBODY, true);
             break;
         case 'PUT':
+        case 'POST':
             if (is_string($upload_resource)) {
                 curl_setopt($curl, CURLOPT_POST, 1);
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $upload_resource);
@@ -61,7 +61,7 @@ function request(string $method, string $uri, $upload_resource = null, ?array $a
     if ($raw_response === false) {
         $error = curl_error($curl);
         curl_close($curl);
-        sleep(1);
+        sleep(5);
         return request(...func_get_args());
     }
     $info = curl_getinfo($curl);
