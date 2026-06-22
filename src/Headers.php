@@ -33,9 +33,8 @@ readonly class Headers implements \IteratorAggregate, \ArrayAccess, \Countable {
         $this->headers = $headers;
     }
     
-    static function authorization(\nostriphant\NIP01\Key $sender_key, string $method, string $uri, array $tags) {        
-        $sender_pubkey = $authorization['pubkey'] ?? $sender_key(\nostriphant\NIP01\Key::public());
-        $authorization_rumor = new \nostriphant\NIP01\Rumor(time(), $sender_pubkey, 24242, $method . ' ' . $uri, $tags);
+    static function authorization(\nostriphant\NIP01\Key $sender_key, string $method, string $uri, array $tags) {  
+        $authorization_rumor = new \nostriphant\NIP01\Rumor(time(), 24242, $method . ' ' . $uri, $tags);
         $authorization_event = $authorization_rumor($sender_key);
         return 'Nostr ' . base64_encode(\nostriphant\NIP01\Nostr::encode($authorization_event()));
     }

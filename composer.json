@@ -5,9 +5,8 @@
     "require": {
         "php": "^8.4",
         "nostriphant/functional": "^2.3",
-        "nostriphant/nip-01": "^2.2"
+        "nostriphant/nip-01": "^3.0"
     },
-    
     "license": "MIT",
     "autoload": {
         "psr-4": {
